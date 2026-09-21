@@ -86,7 +86,7 @@ export function ClubLeaders({ leaders }: { leaders: Leader[] }) {
             <Marquee className="[--gap:0.875rem] sm:[--gap:1.5rem]" pauseOnHover>
               {leaders.map((leader) => (
                 <div
-                  className="group relative h-[360px] w-[clamp(210px,68vw,250px)] shrink-0 overflow-hidden rounded-xl bg-[var(--ink)] shadow-xl sm:h-[400px] sm:w-[300px]"
+                  className="group relative h-[360px] w-[clamp(210px,68vw,250px)] shrink-0 overflow-hidden rounded-xl bg-[var(--ink)] shadow-xl [-webkit-tap-highlight-color:transparent] sm:h-[400px] sm:w-[300px]"
                   key={leader.id}
                 >
                   {/* Plain <img>: leader portraits come from the admin panel
@@ -96,7 +96,7 @@ export function ClubLeaders({ leaders }: { leaders: Leader[] }) {
                     alt={leader.name}
                     loading="lazy"
                     src={leader.photoUrl}
-                    className="absolute inset-0 h-full w-full object-cover saturate-100 transition-all duration-[800ms] ease-[cubic-bezier(.15,.45,.15,1.2)] group-hover:scale-[1.07] [@media(hover:hover)]:saturate-[.2] [@media(hover:hover)]:group-hover:saturate-100"
+                    className="absolute inset-0 h-full w-full object-cover saturate-100 transition-all duration-[800ms] ease-[cubic-bezier(.15,.45,.15,1.2)] [@media(hover:hover)]:saturate-[.2] [@media(hover:hover)]:group-hover:scale-[1.07] [@media(hover:hover)]:group-hover:saturate-100"
                   />
                   {/* info card — always visible on touch devices, hover/focus
                       reveal only where a hover capability exists */}
@@ -117,7 +117,7 @@ export function ClubLeaders({ leaders }: { leaders: Leader[] }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`${leader.name} on LinkedIn`}
-                        className="group/link grid h-11 w-11 flex-shrink-0 place-items-center rounded-full text-neutral-900 transition-transform duration-200 hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+                        className="group/link grid h-11 w-11 flex-shrink-0 place-items-center rounded-full text-neutral-900 [-webkit-tap-highlight-color:transparent] transition-transform duration-200 [@media(hover:hover)]:hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
                       >
                         <LinkedInIcon />
                       </a>
@@ -183,11 +183,11 @@ function LinkedInIcon() {
     >
       <path
         d="M 20.727 0 L 3.273 0 C 1.465 0 0 1.465 0 3.273 L 0 20.727 C 0 22.535 1.465 24 3.273 24 L 20.727 24 C 22.535 24 24 22.535 24 20.727 L 24 3.273 C 24 1.465 22.535 0 20.727 0 Z"
-        className="fill-[#AAAAAA] transition-colors duration-300 group-hover/link:fill-[#0077B5]"
+        className="fill-[#0077B5]"
       />
       <path
         d="M 8.646 6.545 C 8.646 6.95 8.526 7.345 8.301 7.682 C 8.076 8.018 7.757 8.28 7.383 8.435 C 7.009 8.59 6.598 8.631 6.201 8.552 C 5.804 8.473 5.44 8.278 5.154 7.992 C 4.868 7.706 4.673 7.341 4.594 6.944 C 4.515 6.548 4.556 6.136 4.71 5.763 C 4.865 5.389 5.127 5.069 5.464 4.845 C 5.8 4.62 6.196 4.5 6.6 4.5 C 7.143 4.5 7.663 4.715 8.046 5.099 C 8.43 5.483 8.646 6.003 8.646 6.545 Z M 8.182 9.955 L 8.182 18.991 C 8.182 19.058 8.17 19.124 8.144 19.186 C 8.119 19.247 8.082 19.304 8.035 19.351 C 7.988 19.398 7.932 19.436 7.87 19.461 C 7.809 19.487 7.743 19.5 7.676 19.5 L 5.52 19.5 C 5.453 19.5 5.387 19.487 5.326 19.462 C 5.264 19.436 5.208 19.399 5.161 19.352 C 5.114 19.305 5.077 19.249 5.051 19.187 C 5.026 19.125 5.013 19.059 5.013 18.993 L 5.013 9.955 C 5.013 9.82 5.066 9.691 5.161 9.596 C 5.257 9.501 5.386 9.447 5.52 9.447 L 7.676 9.447 C 7.81 9.448 7.939 9.501 8.034 9.596 C 8.129 9.691 8.182 9.82 8.182 9.955 Z M 19.451 14.659 L 19.451 19.034 C 19.451 19.095 19.439 19.156 19.416 19.212 C 19.392 19.269 19.358 19.32 19.315 19.364 C 19.271 19.407 19.22 19.441 19.163 19.465 C 19.107 19.488 19.046 19.5 18.985 19.5 L 16.666 19.5 C 16.605 19.5 16.544 19.488 16.488 19.465 C 16.431 19.441 16.38 19.407 16.336 19.364 C 16.293 19.32 16.259 19.269 16.235 19.212 C 16.212 19.156 16.2 19.095 16.2 19.034 L 16.2 14.794 C 16.2 14.161 16.386 12.023 14.546 12.023 C 13.121 12.023 12.831 13.486 12.773 14.144 L 12.773 19.034 C 12.773 19.156 12.725 19.274 12.639 19.361 C 12.553 19.448 12.436 19.498 12.314 19.5 L 10.075 19.5 C 10.013 19.5 9.953 19.488 9.896 19.464 C 9.84 19.441 9.789 19.407 9.745 19.363 C 9.702 19.32 9.668 19.269 9.645 19.212 C 9.621 19.155 9.61 19.095 9.61 19.034 L 9.61 9.915 C 9.61 9.854 9.621 9.793 9.645 9.737 C 9.668 9.68 9.702 9.629 9.745 9.585 C 9.789 9.542 9.84 9.508 9.896 9.484 C 9.953 9.461 10.013 9.449 10.075 9.449 L 12.314 9.449 C 12.437 9.449 12.556 9.498 12.643 9.585 C 12.731 9.673 12.78 9.791 12.78 9.915 L 12.78 10.703 C 13.309 9.91 14.093 9.297 15.766 9.297 C 19.473 9.297 19.451 12.758 19.451 14.659 Z"
-        className="fill-[#EBEBEB] transition-colors duration-300 group-hover/link:fill-white"
+        className="fill-white"
       />
     </svg>
   );

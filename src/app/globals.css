@@ -583,8 +583,10 @@ a.info-card:hover > svg:last-child { color:var(--coral); }
   animation: marquee var(--duration, 45s) linear infinite;
   will-change: transform;
 }
-.marquee--pausable:hover > .animate-marquee {
-  animation-play-state: paused;
+@media (hover:hover) {
+  .marquee--pausable:hover > .animate-marquee {
+    animation-play-state: paused;
+  }
 }
 
 @media (max-width:860px) {
