@@ -15,8 +15,8 @@ export function EventGallery({ title, images }: { title: string; images: string[
   return <section className="event-gallery" aria-label={`${title} gallery`}>
     <div className="event-gallery__main">
       <AnimatePresence mode="wait">
-        <motion.div key={images[active]} className="event-gallery__image" initial={reduced ? false : { opacity: 0, scale: 1.025 }} animate={{ opacity: 1, scale: 1 }} exit={reduced ? undefined : { opacity: 0 }} transition={{ duration: 0.45 }}>
-          <Image src={images[active]} alt={`${title}, image ${active + 1}`} fill sizes="(max-width: 900px) 100vw, 80vw" priority />
+        <motion.div key={images[active]} className="event-gallery__image" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={reduced ? undefined : { opacity: 0 }} transition={{ duration: 0.45 }}>
+          <Image src={images[active]} alt={`${title}, image ${active + 1}`} fill sizes="(max-width: 900px) 100vw, 80vw" priority style={{ objectFit: "contain" }} />
         </motion.div>
       </AnimatePresence>
       {images.length > 1 && <>

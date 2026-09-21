@@ -1,6 +1,6 @@
 import { Reveal } from "@/components/reveal";
 
-export function SectionHeading({ eyebrow, title, copy, action }: { eyebrow: string; title: string; copy?: string; action?: React.ReactNode }) {
+export function SectionHeading({ eyebrow, title, copy, action }: { eyebrow: string; title: React.ReactNode; copy?: string; action?: React.ReactNode }) {
   return (
     <Reveal className="section-heading">
       <div>

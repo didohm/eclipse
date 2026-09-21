@@ -1,28 +1,757 @@
 "use client";
 
-import { Check, ImagePlus, LoaderCircle, LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
+import {
+  Check,
+  ImagePlus,
+  LoaderCircle,
+  LogOut,
+  Pencil,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useState } from "react";
 import type { ClubEvent, Leader } from "@/lib/types";
 
 type Editing = { kind: "leader"; item?: Leader } | { kind: "event"; item?: ClubEvent } | null;
 
-export function AdminPanel({ authenticated, leaders, events }: { authenticated: boolean; leaders: Leader[]; events: ClubEvent[] }) {
-  const router = useRouter(); const [tab, setTab] = useState<"leaders" | "events">("leaders"); const [editing, setEditing] = useState<Editing>(null);
+export function AdminPanel({
+  authenticated,
+  leaders,
+  events,
+}: {
+  authenticated: boolean;
+  leaders: Leader[];
+  events: ClubEvent[];
+}) {
+  const router = useRouter();
+  const [tab, setTab] = useState<"leaders" | "events">("leaders");
+  const [editing, setEditing] = useState<Editing>(null);
+
+  const remove = useCallback(
+    async (kind: "leaders" | "events", id: string) => {
+      if (!window.confirm("Delete this item? This cannot be undone.")) return;
+      const response = await fetch(`/api/admin/${kind}/${id}`, { method: "DELETE" });
+      if (!response.ok) {
+        alert("The item could not be deleted.");
+        return;
+      }
+      router.refresh();
+    },
+    [router],
+  );
+
+  // The full dataset may be large; keep list rendering off the urgent path.
+  const list = useDeferredValue(tab === "leaders" ? leaders : events);
+
   if (!authenticated) return <AdminLogin />;
-  const remove = async (kind: "leaders" | "events", id: string) => { if (!window.confirm("Delete this item? This cannot be undone.")) return; const response = await fetch(`/api/admin/${kind}/${id}`, { method: "DELETE" }); if (!response.ok) { alert("The item could not be deleted."); return; } router.refresh(); };
-  const list = tab === "leaders" ? leaders : events;
-  return <section className="admin-shell page-shell"><header className="admin-header"><div><p className="eyebrow">ECLIPSE content studio</p><h1>Manage the <em>circle.</em></h1></div><button className="admin-logout" type="button" onClick={async () => { await fetch("/api/admin/logout", { method: "POST" }); router.refresh(); }}><LogOut size={16} /> Sign out</button></header><div className="admin-toolbar"><div className="admin-tabs"><button className={tab === "leaders" ? "is-active" : ""} onClick={() => setTab("leaders")}>Leaders <span>{leaders.length}</span></button><button className={tab === "events" ? "is-active" : ""} onClick={() => setTab("events")}>Events <span>{events.length}</span></button></div><button className="button button--coral" onClick={() => setEditing({ kind: tab === "leaders" ? "leader" : "event" })}><Plus size={17} /> Add {tab === "leaders" ? "leader" : "event"}</button></div><div className="admin-list">{list.length ? tab === "leaders" ? leaders.map((leader) => <article className="admin-row" key={leader.id}><div><p className="eyebrow">{leader.position}</p><h2>{leader.name}</h2></div><div className="admin-row__actions"><button type="button" onClick={() => setEditing({ kind: "leader", item: leader })} aria-label={`Edit ${leader.name}`}><Pencil size={17} /></button><button type="button" onClick={() => remove("leaders", leader.id)} aria-label={`Delete ${leader.name}`}><Trash2 size={17} /></button></div></article>) : events.map((event) => <article className="admin-row" key={event.id}><div><p className="eyebrow">{event.date} · {event.location}</p><h2>{event.title}</h2></div><div className="admin-row__actions"><button type="button" onClick={() => setEditing({ kind: "event", item: event })} aria-label={`Edit ${event.title}`}><Pencil size={17} /></button><button type="button" onClick={() => remove("events", event.id)} aria-label={`Delete ${event.title}`}><Trash2 size={17} /></button></div></article>) : <div className="admin-empty"><p className="eyebrow">No {tab} yet</p><p>Add the first item when it is ready to publish.</p></div>}</div>{editing && <Editor editing={editing} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); router.refresh(); }} />}</section>;
+
+  return (
+    <section className="admin-shell page-shell">
+      <header className="admin-header">
+        <div>
+          <p className="eyebrow">ECLIPSE content studio</p>
+          <h1>
+            Manage the <em>circle.</em>
+          </h1>
+        </div>
+        <button
+          className="admin-logout"
+          type="button"
+          onClick={async () => {
+            await fetch("/api/admin/logout", { method: "POST" });
+            router.refresh();
+          }}
+        >
+          <LogOut size={16} /> Sign out
+        </button>
+      </header>
+
+      <div className="admin-toolbar">
+        <div className="admin-tabs">
+          <button
+            type="button"
+            className={tab === "leaders" ? "is-active" : ""}
+            onClick={() => setTab("leaders")}
+          >
+            Leaders <span>{leaders.length}</span>
+          </button>
+          <button
+            type="button"
+            className={tab === "events" ? "is-active" : ""}
+            onClick={() => setTab("events")}
+          >
+            Events <span>{events.length}</span>
+          </button>
+        </div>
+        <button
+          className="button button--coral"
+          type="button"
+          onClick={() => setEditing({ kind: tab === "leaders" ? "leader" : "event" })}
+        >
+          <Plus size={17} /> Add {tab === "leaders" ? "leader" : "event"}
+        </button>
+      </div>
+
+      <div className="admin-list">
+        {list.length ? (
+          tab === "leaders" ? (
+            leaders.map((leader) => (
+              <article className="admin-row" key={leader.id}>
+                <div>
+                  <p className="eyebrow">{leader.position}</p>
+                  <h2>{leader.name}</h2>
+                </div>
+                <div className="admin-row__actions">
+                  <button
+                    type="button"
+                    onClick={() => setEditing({ kind: "leader", item: leader })}
+                    aria-label={`Edit ${leader.name}`}
+                  >
+                    <Pencil size={17} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => remove("leaders", leader.id)}
+                    aria-label={`Delete ${leader.name}`}
+                  >
+                    <Trash2 size={17} />
+                  </button>
+                </div>
+              </article>
+            ))
+          ) : (
+            events.map((event) => (
+              <article className="admin-row" key={event.id}>
+                <div>
+                  <p className="eyebrow">
+                    {event.date} · {event.location}
+                  </p>
+                  <h2>{event.title}</h2>
+                </div>
+                <div className="admin-row__actions">
+                  <button
+                    type="button"
+                    onClick={() => setEditing({ kind: "event", item: event })}
+                    aria-label={`Edit ${event.title}`}
+                  >
+                    <Pencil size={17} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => remove("events", event.id)}
+                    aria-label={`Delete ${event.title}`}
+                  >
+                    <Trash2 size={17} />
+                  </button>
+                </div>
+              </article>
+            ))
+          )
+        ) : (
+          <div className="admin-empty">
+            <p className="eyebrow">No {tab} yet</p>
+            <p>Add the first item when it is ready to publish.</p>
+          </div>
+        )}
+      </div>
+
+      {editing && (
+        <Editor
+          editing={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            router.refresh();
+          }}
+        />
+      )}
+    </section>
+  );
 }
 
-function AdminLogin() { const router = useRouter(); const [password, setPassword] = useState(""); const [error, setError] = useState(""); const [busy, setBusy] = useState(false); const submit = async (event: React.FormEvent) => { event.preventDefault(); setBusy(true); setError(""); const response = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) }); const result = await response.json(); setBusy(false); if (!response.ok) { setError(result.error ?? "Access could not be verified."); return; } router.refresh(); }; return <main className="admin-login page-shell"><form onSubmit={submit}><p className="eyebrow">ECLIPSE administration</p><h1>Private <em>access.</em></h1><label className="form-field"><span>Admin password</span><input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" required /></label><button className="button button--navy" disabled={busy}>{busy ? "Checking…" : "Continue"}</button>{error && <p className="form-error" role="alert">{error}</p>}</form></main>; }
+function AdminLogin() {
+  const router = useRouter();
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
-function Editor({ editing, onClose, onSaved }: { editing: Exclude<Editing, null>; onClose: () => void; onSaved: () => void }) { return <div className="editor-backdrop" role="dialog" aria-modal="true" aria-label={editing.kind === "leader" ? "Leader editor" : "Event editor"}><div className="editor"><button className="editor-close" type="button" onClick={onClose} aria-label="Close editor"><X /></button>{editing.kind === "leader" ? <LeaderEditor item={editing.item} onSaved={onSaved} /> : <EventEditor item={editing.item} onSaved={onSaved} />}</div></div>; }
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setBusy(true);
+    setError("");
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    });
+    const result = await response.json();
+    setBusy(false);
+    if (!response.ok) {
+      setError(result.error ?? "Access could not be verified.");
+      return;
+    }
+    router.refresh();
+  };
 
-function LeaderEditor({ item, onSaved }: { item?: Leader; onSaved: () => void }) { const [form, setForm] = useState({ name: item?.name ?? "", position: item?.position ?? "", photoUrl: item?.photoUrl ?? "", bio: item?.bio ?? "", linkedinUrl: item?.linkedinUrl ?? "" }); const [busy, setBusy] = useState(false); const [error, setError] = useState(""); const update = (key: keyof typeof form, value: string) => setForm((state) => ({ ...state, [key]: value })); const save = async (event: React.FormEvent) => { event.preventDefault(); setBusy(true); setError(""); const response = await fetch(item ? `/api/admin/leaders/${item.id}` : "/api/admin/leaders", { method: item ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) }); const result = await response.json(); setBusy(false); if (!response.ok) { setError(result.error ?? "This leader could not be saved."); return; } onSaved(); }; return <form className="editor-form" onSubmit={save}><p className="eyebrow">{item ? "Edit leader" : "New leader"}</p><h2>{item ? item.name : "Add a club leader"}</h2><SimpleField label="Full name"><input value={form.name} onChange={(e) => update("name", e.target.value)} required /></SimpleField><SimpleField label="Position"><input value={form.position} onChange={(e) => update("position", e.target.value)} required /></SimpleField><UploadField label="Portrait" type="leader" value={form.photoUrl} onChange={(url) => update("photoUrl", url)} /><SimpleField label="Short bio"><textarea rows={4} value={form.bio} onChange={(e) => update("bio", e.target.value)} required /></SimpleField><SimpleField label="LinkedIn URL"><input type="url" value={form.linkedinUrl} onChange={(e) => update("linkedinUrl", e.target.value)} required /></SimpleField><SaveButton busy={busy} />{error && <p className="form-error" role="alert">{error}</p>}</form>; }
+  return (
+    <main className="admin-login page-shell">
+      <form onSubmit={submit}>
+        <p className="eyebrow">ECLIPSE administration</p>
+        <h1>
+          Private <em>access.</em>
+        </h1>
+        <label className="form-field">
+          <span>Admin password</span>
+          <input
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            autoComplete="current-password"
+            required
+          />
+        </label>
+        <button className="button button--navy" disabled={busy}>
+          {busy ? "Checking…" : "Continue"}
+        </button>
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
+      </form>
+    </main>
+  );
+}
 
-function EventEditor({ item, onSaved }: { item?: ClubEvent; onSaved: () => void }) { const [form, setForm] = useState({ title: item?.title ?? "", shortDescription: item?.shortDescription ?? "", fullDescription: item?.fullDescription ?? "", date: item?.date ?? "", location: item?.location ?? "", images: item?.images ?? [], primaryImage: item?.primaryImage ?? "" }); const [busy, setBusy] = useState(false); const [error, setError] = useState(""); const update = (key: Exclude<keyof typeof form, "images">, value: string) => setForm((state) => ({ ...state, [key]: value })); const addImage = (url: string) => setForm((state) => ({ ...state, images: [...state.images, url], primaryImage: state.primaryImage || url })); const removeImage = (url: string) => setForm((state) => { const images = state.images.filter((image) => image !== url); return { ...state, images, primaryImage: state.primaryImage === url ? images[0] ?? "" : state.primaryImage }; }); const save = async (event: React.FormEvent) => { event.preventDefault(); setBusy(true); setError(""); const response = await fetch(item ? `/api/admin/events/${item.id}` : "/api/admin/events", { method: item ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) }); const result = await response.json(); setBusy(false); if (!response.ok) { setError(result.error ?? "This event could not be saved."); return; } onSaved(); }; return <form className="editor-form" onSubmit={save}><p className="eyebrow">{item ? "Edit event" : "New event"}</p><h2>{item ? item.title : "Add an event"}</h2><SimpleField label="Title"><input value={form.title} onChange={(e) => update("title", e.target.value)} required /></SimpleField><SimpleField label="Short description"><textarea rows={2} value={form.shortDescription} onChange={(e) => update("shortDescription", e.target.value)} required /></SimpleField><SimpleField label="Full description"><textarea rows={6} value={form.fullDescription} onChange={(e) => update("fullDescription", e.target.value)} required /></SimpleField><div className="field-grid"><SimpleField label="Date"><input type="date" value={form.date} onChange={(e) => update("date", e.target.value)} required /></SimpleField><SimpleField label="Location"><input value={form.location} onChange={(e) => update("location", e.target.value)} required /></SimpleField></div><UploadField label="Event images" type="event" multiple onChange={addImage} /><div className="uploaded-images">{form.images.map((url) => <div key={url}><button type="button" className={form.primaryImage === url ? "is-primary" : ""} onClick={() => update("primaryImage", url)}>{form.primaryImage === url && <Check size={14} />} Primary</button><button type="button" onClick={() => removeImage(url)} aria-label="Remove image"><Trash2 size={15} /></button></div>)}</div><SaveButton busy={busy} />{error && <p className="form-error" role="alert">{error}</p>}</form>; }
+function Editor({
+  editing,
+  onClose,
+  onSaved,
+}: {
+  editing: Exclude<Editing, null>;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  // Correct dialog logic: Esc closes, backdrop click closes, body scroll locks.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previous;
+    };
+  }, [onClose]);
 
-function SimpleField({ label, children }: { label: string; children: React.ReactNode }) { return <label className="form-field"><span>{label}</span>{children}</label>; }
-function UploadField({ label, type, value, onChange, multiple = false }: { label: string; type: "leader" | "event"; value?: string; onChange: (url: string) => void; multiple?: boolean }) { const [busy, setBusy] = useState(false); const [error, setError] = useState(""); const upload = async (files: FileList | null) => { if (!files?.length) return; setBusy(true); setError(""); for (const file of Array.from(files)) { const data = new FormData(); data.set("file", file); data.set("type", type); const response = await fetch("/api/admin/upload", { method: "POST", body: data }); const result = await response.json(); if (!response.ok) { setError(result.error ?? "Upload failed."); break; } onChange(result.url); } setBusy(false); }; return <label className="upload-field"><span>{label}</span>{value && <small>Image selected</small>}<input type="file" accept="image/*" multiple={multiple} onChange={(e) => upload(e.target.files)} /><b>{busy ? <LoaderCircle size={17} className="spin" /> : <ImagePlus size={17} />} {busy ? "Uploading…" : multiple ? "Add images" : "Upload image"}</b>{error && <small className="form-error">{error}</small>}</label>; }
-function SaveButton({ busy }: { busy: boolean }) { return <button className="button button--navy" disabled={busy}>{busy ? "Saving…" : "Save changes"}</button>; }
+  return (
+    <div
+      className="editor-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-label={editing.kind === "leader" ? "Leader editor" : "Event editor"}
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <div className={`editor ${editing.kind === "event" ? "editor--wide" : ""}`}>
+        <button className="editor-close" type="button" onClick={onClose} aria-label="Close editor">
+          <X size={18} />
+        </button>
+        {editing.kind === "leader" ? (
+          <LeaderEditor item={editing.item} onClose={onClose} onSaved={onSaved} />
+        ) : (
+          <EventEditor item={editing.item} onClose={onClose} onSaved={onSaved} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function LeaderEditor({
+  item,
+  onClose,
+  onSaved,
+}: {
+  item?: Leader;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [form, setForm] = useState({
+    name: item?.name ?? "",
+    position: item?.position ?? "",
+    photoUrl: item?.photoUrl ?? "",
+    linkedinUrl: item?.linkedinUrl ?? "",
+  });
+  const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
+  const update = (key: keyof typeof form, value: string) =>
+    setForm((state) => ({ ...state, [key]: value }));
+
+  const save = async (event: React.FormEvent) => {
+    event.preventDefault();
+    // Correct logic: block save while an upload is in flight, require portrait.
+    if (uploading) {
+      setError("Wait for the portrait to finish uploading.");
+      return;
+    }
+    if (!form.photoUrl) {
+      setError("Upload a portrait first.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    const payload = {
+      name: form.name.trim(),
+      position: form.position.trim(),
+      photoUrl: form.photoUrl.trim(),
+      linkedinUrl: form.linkedinUrl.trim(),
+    };
+    const response = await fetch(item ? `/api/admin/leaders/${item.id}` : "/api/admin/leaders", {
+      method: item ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json().catch(() => ({}));
+    setBusy(false);
+    if (!response.ok) {
+      setError(result.error ?? "This leader could not be saved.");
+      return;
+    }
+    onSaved();
+  };
+
+  const isSaving = busy || uploading;
+
+  return (
+    <form className="editor-form editor-form--compact" onSubmit={save}>
+      <div className="editor-head">
+        <p className="eyebrow">{item ? "Edit leader" : "New leader"}</p>
+        <h2>{item ? item.name : "Add a club leader"}</h2>
+      </div>
+
+      <div className="editor-grid-2">
+        <SimpleField label="Full name" required>
+          <input
+            value={form.name}
+            onChange={(e) => update("name", e.target.value)}
+            placeholder="Jane Doe"
+            autoFocus
+            required
+            minLength={2}
+          />
+        </SimpleField>
+        <SimpleField label="Position" required>
+          <input
+            value={form.position}
+            onChange={(e) => update("position", e.target.value)}
+            placeholder="President"
+            required
+            minLength={2}
+          />
+        </SimpleField>
+      </div>
+
+      <UploadField
+        label="Portrait"
+        type="leader"
+        value={form.photoUrl}
+        required
+        onChange={(url) => update("photoUrl", url)}
+        onRemove={() => update("photoUrl", "")}
+        onUploadingChange={setUploading}
+      />
+
+      <SimpleField label="LinkedIn URL" hint="Optional">
+        <input
+          type="url"
+          inputMode="url"
+          value={form.linkedinUrl}
+          onChange={(e) => update("linkedinUrl", e.target.value)}
+          placeholder="https://linkedin.com/in/…"
+        />
+      </SimpleField>
+
+      {error && (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      )}
+
+      <div className="editor-foot">
+        <button type="button" className="editor-cancel" onClick={onClose}>
+          Cancel
+        </button>
+        <button className="button button--navy" disabled={isSaving}>
+          {busy ? "Saving…" : uploading ? "Uploading…" : "Save changes"}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function EventEditor({
+  item,
+  onClose,
+  onSaved,
+}: {
+  item?: ClubEvent;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [form, setForm] = useState({
+    title: item?.title ?? "",
+    shortDescription: item?.shortDescription ?? "",
+    fullDescription: item?.fullDescription ?? "",
+    date: item?.date ?? "",
+    location: item?.location ?? "",
+    images: item?.images ?? [],
+    primaryImage: item?.primaryImage ?? "",
+  });
+  const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
+  const update = (key: Exclude<keyof typeof form, "images">, value: string) =>
+    setForm((state) => ({ ...state, [key]: value }));
+
+  const addImage = (url: string) =>
+    setForm((state) => ({
+      ...state,
+      images: state.images.includes(url) ? state.images : [...state.images, url],
+      primaryImage: state.primaryImage || url,
+    }));
+
+  const removeImage = (url: string) =>
+    setForm((state) => {
+      const images = state.images.filter((image) => image !== url);
+      return {
+        ...state,
+        images,
+        primaryImage: state.primaryImage === url ? (images[0] ?? "") : state.primaryImage,
+      };
+    });
+
+  const save = async (event: React.FormEvent) => {
+    event.preventDefault();
+    // Correct logic: never send an empty gallery or a primary outside the gallery.
+    if (uploading) {
+      setError("Wait for the images to finish uploading.");
+      return;
+    }
+    if (!form.images.length) {
+      setError("Upload at least one image.");
+      return;
+    }
+    const primaryImage =
+      form.primaryImage && form.images.includes(form.primaryImage)
+        ? form.primaryImage
+        : form.images[0];
+    setBusy(true);
+    setError("");
+    const payload = {
+      title: form.title.trim(),
+      shortDescription: form.shortDescription.trim(),
+      fullDescription: form.fullDescription.trim(),
+      date: form.date,
+      location: form.location.trim(),
+      images: form.images,
+      primaryImage,
+    };
+    const response = await fetch(item ? `/api/admin/events/${item.id}` : "/api/admin/events", {
+      method: item ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json().catch(() => ({}));
+    setBusy(false);
+    if (!response.ok) {
+      setError(result.error ?? "This event could not be saved.");
+      return;
+    }
+    onSaved();
+  };
+
+  const isSaving = busy || uploading;
+
+  return (
+    <form className="editor-form editor-form--compact" onSubmit={save}>
+      <div className="editor-head">
+        <p className="eyebrow">{item ? "Edit event" : "New event"}</p>
+        <h2>{item ? item.title : "Add an event"}</h2>
+      </div>
+
+      <SimpleField label="Title" required>
+        <input
+          value={form.title}
+          onChange={(e) => update("title", e.target.value)}
+          placeholder="Design sprint Vol. 4"
+          autoFocus
+          required
+          minLength={2}
+        />
+      </SimpleField>
+
+      <div className="editor-grid-2 editor-grid-2--desc">
+        <SimpleField label="Short description" required>
+          <textarea
+            rows={2}
+            value={form.shortDescription}
+            onChange={(e) => update("shortDescription", e.target.value)}
+            placeholder="One line for cards…"
+            required
+            minLength={8}
+          />
+        </SimpleField>
+        <SimpleField label="Full description" required>
+          <textarea
+            rows={2}
+            value={form.fullDescription}
+            onChange={(e) => update("fullDescription", e.target.value)}
+            placeholder="Agenda, guests, takeaways…"
+            required
+            minLength={20}
+          />
+        </SimpleField>
+      </div>
+
+      <div className="editor-grid-2">
+        <SimpleField label="Date" required>
+          <input
+            type="date"
+            value={form.date}
+            onChange={(e) => update("date", e.target.value)}
+            required
+          />
+        </SimpleField>
+        <SimpleField label="Location" required>
+          <input
+            value={form.location}
+            onChange={(e) => update("location", e.target.value)}
+            placeholder="Main hall"
+            required
+            minLength={2}
+          />
+        </SimpleField>
+      </div>
+
+      <UploadField
+        label={`Event images (${form.images.length})`}
+        type="event"
+        multiple
+        hint="First image is the cover — click any thumbnail to set cover"
+        onChange={addImage}
+        onUploadingChange={setUploading}
+      />
+
+      {form.images.length > 0 && (
+        <div className="thumb-grid" role="list" aria-label="Uploaded event images">
+          {form.images.map((url) => {
+            const isPrimary = form.primaryImage === url || (!form.primaryImage && form.images[0] === url);
+            return (
+              <div key={url} role="listitem" className={`thumb${isPrimary ? " is-primary" : ""}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt="" loading="lazy" />
+                <div className="thumb__bar">
+                  <button
+                    type="button"
+                    className="thumb__primary"
+                    onClick={() => update("primaryImage", url)}
+                    title={isPrimary ? "Cover image" : "Set as cover"}
+                  >
+                    {isPrimary && <Check size={12} />}
+                    {isPrimary ? "Cover" : "Set cover"}
+                  </button>
+                  <button
+                    type="button"
+                    className="thumb__remove"
+                    onClick={() => removeImage(url)}
+                    aria-label="Remove image"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {error && (
+        <p className="form-error" role="alert">
+          {error}
+        </p>
+      )}
+
+      <div className="editor-foot">
+        <button type="button" className="editor-cancel" onClick={onClose}>
+          Cancel
+        </button>
+        <button className="button button--navy" disabled={isSaving}>
+          {busy ? "Saving…" : uploading ? "Uploading…" : "Save changes"}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function SimpleField({
+  label,
+  required,
+  hint,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="form-field">
+      <span className="form-field__label">
+        {label} {required && <i aria-hidden="true">*</i>}
+        {hint && <em>{hint}</em>}
+      </span>
+      {children}
+    </label>
+  );
+}
+
+function UploadField({
+  label,
+  type,
+  value,
+  onChange,
+  onRemove,
+  onUploadingChange,
+  multiple = false,
+  required,
+  hint,
+}: {
+  label: string;
+  type: "leader" | "event";
+  value?: string;
+  onChange: (url: string) => void;
+  onRemove?: () => void;
+  onUploadingChange?: (uploading: boolean) => void;
+  multiple?: boolean;
+  required?: boolean;
+  hint?: string;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  const upload = async (files: FileList | null, input: HTMLInputElement) => {
+    if (!files?.length) return;
+    setBusy(true);
+    onUploadingChange?.(true);
+    setError("");
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) {
+        setError("Choose an image file.");
+        continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        setError(`${file.name}: images must be 10 MB or smaller.`);
+        continue;
+      }
+      const data = new FormData();
+      data.set("file", file);
+      data.set("type", type);
+      try {
+        const response = await fetch("/api/admin/upload", { method: "POST", body: data });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          setError(result.error ?? "Upload failed.");
+          break;
+        }
+        if (result.url) onChange(result.url);
+      } catch {
+        setError("Upload failed. Try again.");
+        break;
+      }
+    }
+    // Correct logic: reset the input so the same file can be picked again.
+    input.value = "";
+    setBusy(false);
+    onUploadingChange?.(false);
+  };
+
+  // Single-image mode (leader portrait): show compact preview + replace/remove.
+  if (!multiple) {
+    return (
+      <div className="upload-field upload-field--single">
+        <span className="form-field__label">
+          {label} {required && <i aria-hidden="true">*</i>}
+          {hint && <em>{hint}</em>}
+          {!hint && !value && <em>Required</em>}
+        </span>
+        <div className="upload-row">
+          {value ? (
+            <div className="portrait-preview">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={value} alt="" loading="lazy" />
+              <span>Portrait ready</span>
+              {onRemove && (
+                <button type="button" onClick={onRemove} aria-label="Remove portrait">
+                  <Trash2 size={13} />
+                </button>
+              )}
+            </div>
+          ) : (
+            <span className="upload-empty">No portrait yet</span>
+          )}
+          <label className="upload-btn">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => upload(e.target.files, e.target)}
+            />
+            <b>
+              {busy ? <LoaderCircle size={15} className="spin" /> : <ImagePlus size={15} />}
+              {busy ? "Uploading…" : value ? "Replace" : "Upload image"}
+            </b>
+          </label>
+        </div>
+        {error && (
+          <small className="form-error" role="alert">
+            {error}
+          </small>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="upload-field">
+      <span className="form-field__label">
+        {label} <i aria-hidden="true">*</i>
+        {hint && <em>{hint}</em>}
+      </span>
+      <label className="upload-btn upload-btn--row">
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) => upload(e.target.files, e.target)}
+        />
+        <b>
+          {busy ? <LoaderCircle size={15} className="spin" /> : <ImagePlus size={15} />}
+          {busy ? "Uploading…" : "Add images"}
+        </b>
+        <small>JPG / PNG / WebP · max 10 MB</small>
+      </label>
+      {error && (
+        <small className="form-error" role="alert">
+          {error}
+        </small>
+      )}
+    </div>
+  );
+}

@@ -3,7 +3,6 @@ export type Leader = {
   name: string;
   position: string;
   photoUrl: string;
-  bio: string;
   linkedinUrl: string;
 };
 

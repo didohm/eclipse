@@ -1,12 +1,13 @@
 import { z } from "zod";
 
-const url = z.string().url("Enter a valid URL.");
 export const leaderSchema = z.object({
   name: z.string().trim().min(2, "Enter a name."),
   position: z.string().trim().min(2, "Enter a position."),
   photoUrl: z.string().url("Upload a portrait first."),
-  bio: z.string().trim().min(8, "Add a short bio."),
-  linkedinUrl: url,
+  linkedinUrl: z
+    .string()
+    .trim()
+    .refine((v) => v === "" || z.string().url().safeParse(v).success, "Enter a valid LinkedIn URL."),
 });
 
 export const eventSchema = z.object({
@@ -20,9 +21,10 @@ export const eventSchema = z.object({
 }).refine((value) => value.images.includes(value.primaryImage), { path: ["primaryImage"], message: "The primary image must be one of the uploaded images." });
 
 export const contactSchema = z.object({
-  lastName: z.string().trim().min(2, "Enter your name."),
+  lastName: z.string().trim().min(2, "Enter your last name."),
   firstName: z.string().trim().min(2, "Enter your first name."),
   email: z.string().trim().email("Enter a valid email."),
-  phone: z.string().trim().min(6, "Enter a valid phone number."),
-  message: z.string().trim().min(15, "Tell us a little more."),
+  phone: z.string().trim().optional().refine((v) => !v || v.length >= 6, "Enter a valid phone number."),
+  topic: z.string().trim().max(40).optional(),
+  message: z.string().trim().min(15, "Tell us a little more (15 characters minimum)."),
 });

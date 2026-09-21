@@ -1,19 +1,12 @@
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
-import type { ReactNode } from "react";
-
-export function Reveal({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
-  const reduced = useReducedMotion();
-  return (
-    <motion.div
-      className={className}
-      initial={reduced ? false : { opacity: 0, y: 24 }}
-      whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.18 }}
-      transition={{ duration: 0.72, delay, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-}
+/**
+ * Compatibility re-export.
+ *
+ * The reveal primitive now lives in the shared motion system at
+ * `@/components/motion`. This shim keeps the ~30 existing usages across the
+ * app (`<Reveal delay={...}>`) working unchanged.
+ *
+ * For new code, prefer:
+ *   import { Reveal } from "@/components/motion";
+ */
+export { Reveal, RevealTall } from "@/components/motion";
+export type { RevealAnimation } from "@/components/motion";

@@ -1,7 +1,8 @@
 import { FieldValue } from "firebase-admin/firestore";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
-import { getDb } from "@/lib/firebase-admin";
+import { REVALIDATE_TAGS, getDb } from "@/lib/content";
 import { leaderSchema } from "@/lib/schemas";
 export async function POST(request: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -9,5 +10,6 @@ export async function POST(request: Request) {
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid leader." }, { status: 400 });
   const db = getDb(); if (!db) return NextResponse.json({ error: "Firestore is not configured." }, { status: 503 });
   const reference = await db.collection("leaders").add({ ...parsed.data, createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
+  revalidateTag(REVALIDATE_TAGS.leaders, "max");
   return NextResponse.json({ id: reference.id }, { status: 201 });
 }

@@ -1,37 +1,104 @@
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { EmptyMedia } from "@/components/empty-media";
+import { ClubLeaders } from "@/components/club-leaders";
+import { Parallax } from "@/components/motion/parallax";
+import { Reveal } from "@/components/motion/reveal";
+import { Stagger, StaggerItem } from "@/components/motion/stagger";
 import { EventCard } from "@/components/event-card";
 import { Faq } from "@/components/faq";
 import { Hero } from "@/components/hero";
-import { Reveal } from "@/components/reveal";
+import { JoinSection } from "@/components/join-section";
 import { SectionHeading } from "@/components/section-heading";
 import { getEvents, getLeaders } from "@/lib/content";
+import { faqItems } from "@/lib/faq";
+import { site } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: {
+    absolute: "ECLIPSE — Scientific & Digital Student Club at ESGEN, Kolea",
+  },
+  description:
+    "Join ECLIPSE, ESGEN's scientific & digital student club in Kolea, Algeria. Workshops, research sprints, events and a curious student community — open to all five ESGEN disciplines.",
+  alternates: { canonical: site.url },
+  openGraph: {
+    type: "website",
+    url: site.url,
+    title: "ECLIPSE — Scientific & Digital Student Club at ESGEN, Kolea",
+    description:
+      "Workshops, research sprints, events and community for curious students at ESGEN, Kolea University Hub.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ECLIPSE — Scientific & Digital Student Club at ESGEN, Kolea",
+    description:
+      "Workshops, research sprints, events and community for curious students at ESGEN, Kolea University Hub.",
+  },
+};
+
+// ~90 kB of Framer Motion + story viewer logic, only needed once a visitor
+// actually opens a story. Loads on idle so it never blocks first paint.
+const EventStories = dynamic(() =>
+  import("@/components/event-stories").then((mod) => mod.EventStories),
+);
 
 export default async function Home() {
   const [events, leaders] = await Promise.all([getEvents(), getLeaders()]);
   const latestEvents = events.slice(0, 3);
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map(([question, answer]) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: { "@type": "Answer", text: answer },
+    })),
+  };
   return <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
+    />
     <Hero />
     <main>
       <section className="members-section page-shell">
         <Reveal className="members-section__visual">
-          <EmptyMedia label="ECLIPSE members photography" />
+          <Parallax distance={44} className="members-section__photo">
+            <Image
+              src="https://res.cloudinary.com/drzwqhmsd/image/upload/v1789570257/plbwxm6u9azdpcpiz8cn.jpg"
+              alt="ECLIPSE members photography"
+              fill
+              priority
+              sizes="100vw"
+            />
+          </Parallax>
           <div className="members-section__number"><strong>20+</strong><span>Active<br />Members</span></div>
-          <p className="members-section__caption">Our circle is growing — one question, workshop and conversation at a time.</p>
+          <p className="members-section__caption">Growing one question, workshop and conversation at a time.</p>
         </Reveal>
       </section>
       <section className="section section--events page-shell">
-        <SectionHeading eyebrow="What’s in motion" title="Latest events." copy="The latest three moments from the ECLIPSE calendar, always arranged by date." action={<Link href="/events" className="text-link">View all events <ArrowRight size={16} /></Link>} />
-        {latestEvents.length ? <div className="event-grid">{latestEvents.map((event, index) => <EventCard key={event.id} event={event} index={index} />)}</div> : <Reveal><div className="content-empty"><p className="eyebrow">Calendar in preparation</p><h3>New ECLIPSE events will appear here.</h3><p>The programme will be published as the club confirms each date.</p></div></Reveal>}
+        <SectionHeading eyebrow="What’s in motion" title="Latest events." copy="The latest three moments from the ECLIPSE calendar." action={<Link href="/events" className="text-link">View all events <ArrowRight size={16} /></Link>} />
+        {latestEvents.length ? (
+          <>
+            <div className="mb-10">
+              <Suspense fallback={null}>
+                <EventStories events={latestEvents} />
+              </Suspense>
+            </div>
+            <Stagger className="event-grid">{latestEvents.map((event, index) => <StaggerItem key={event.id}><EventCard event={event} index={index} /></StaggerItem>)}</Stagger>
+          </>
+        ) : (
+          <Reveal><div className="content-empty"><p className="eyebrow">Calendar in preparation</p><h3>New ECLIPSE events will appear here.</h3><p>The programme will be published as the club confirms each date.</p></div></Reveal>
+        )}
       </section>
-      <section className="section leaders-section page-shell">
-        <SectionHeading eyebrow="The people behind the circle" title="Club leaders." copy="Meet the students shaping ECLIPSE’s next chapter." />
-        {leaders.length ? <div className="leaders-grid">{leaders.map((leader, index) => <Reveal key={leader.id} delay={index * 0.08}><article className="leader-card"><div className="leader-card__image">{leader.photoUrl ? <Image src={leader.photoUrl} alt={leader.name} fill sizes="(max-width: 700px) 100vw, 33vw" /> : <EmptyMedia label={`${leader.name} portrait`} />}</div><p className="eyebrow">{leader.position}</p><h3>{leader.name}</h3>{leader.bio && <p>{leader.bio}</p>}{leader.linkedinUrl && <a className="text-link" href={leader.linkedinUrl} target="_blank" rel="noreferrer">LinkedIn <span>↗</span></a>}</article></Reveal>)}</div> : <Reveal><div className="content-empty content-empty--thin"><p className="eyebrow">Leadership</p><h3>The club leadership will be introduced here.</h3></div></Reveal>}
+      <section className="leaders-section">
+        <Reveal><ClubLeaders leaders={leaders} /></Reveal>
       </section>
-      <section className="section faq-section page-shell"><SectionHeading eyebrow="Good to know" title="Questions, answered." /><Reveal><Faq /></Reveal></section>
-      <section className="join-section page-shell"><Reveal className="join-section__inner"><div><p className="eyebrow">Become part of it</p><h2>Bring your questions<br />into the <em>circle.</em></h2></div><Link href="/contact" className="join-section__link" aria-label="Contact ECLIPSE"><span>Join us</span><ArrowRight size={34} /></Link></Reveal></section>
+      <section id="faqs" className="section faq-section page-shell scroll-mt-24"><SectionHeading eyebrow="Good to know" title={<>Questions, <em>answered.</em></>} /><Reveal><Faq /></Reveal></section>
+      <JoinSection />
     </main>
   </>;
 }
