@@ -1,6 +1,6 @@
 const rawUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://eclipseclub.vercel.app");
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://eclipse-esgen.vercel.app");
 
 // Normalise once: strip trailing slashes so sitemap / canonical / OG URLs
 // never emit `//about` or `http://localhost:3000` in production builds.
