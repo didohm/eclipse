@@ -55,7 +55,7 @@ export function ClubLeaders({ leaders }: { leaders: Leader[] }) {
                 Club leaders.
                 <svg
                   aria-hidden="true"
-                  className="absolute -top-2 -right-8 -z-10 w-24 text-[var(--ink)] opacity-10"
+                  className="absolute -top-2 -right-4 -z-10 w-16 text-[var(--ink)] opacity-10 sm:-right-8 sm:w-24"
                   fill="currentColor"
                   height="86"
                   viewBox="0 0 108 86"
@@ -80,13 +80,13 @@ export function ClubLeaders({ leaders }: { leaders: Leader[] }) {
 
         {leaders.length ? (
           <div className="relative w-full">
-            <div className="pointer-events-none absolute top-0 left-0 z-10 h-full w-16 bg-gradient-to-r from-[var(--paper)] to-transparent sm:w-32" />
-            <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-16 bg-gradient-to-l from-[var(--paper)] to-transparent sm:w-32" />
+            <div className="pointer-events-none absolute top-0 left-0 z-10 h-full w-8 bg-gradient-to-r from-[var(--paper)] to-transparent sm:w-32" />
+            <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-8 bg-gradient-to-l from-[var(--paper)] to-transparent sm:w-32" />
 
-            <Marquee className="[--gap:1rem] sm:[--gap:1.5rem]" pauseOnHover>
+            <Marquee className="[--gap:0.875rem] sm:[--gap:1.5rem]" pauseOnHover>
               {leaders.map((leader) => (
                 <div
-                  className="group relative h-[340px] w-[250px] shrink-0 overflow-hidden rounded-xl bg-[var(--ink)] shadow-xl sm:h-[400px] sm:w-[300px]"
+                  className="group relative h-[360px] w-[clamp(210px,68vw,250px)] shrink-0 overflow-hidden rounded-xl bg-[var(--ink)] shadow-xl sm:h-[400px] sm:w-[300px]"
                   key={leader.id}
                 >
                   {/* Plain <img>: leader portraits come from the admin panel
@@ -96,10 +96,13 @@ export function ClubLeaders({ leaders }: { leaders: Leader[] }) {
                     alt={leader.name}
                     loading="lazy"
                     src={leader.photoUrl}
-                    className="absolute inset-0 h-full w-full object-cover saturate-[.2] transition-all duration-[800ms] ease-[cubic-bezier(.15,.45,.15,1.2)] group-hover:scale-[1.07] group-hover:saturate-100"
+                    className="absolute inset-0 h-full w-full object-cover saturate-100 transition-all duration-[800ms] ease-[cubic-bezier(.15,.45,.15,1.2)] group-hover:scale-[1.07] [@media(hover:hover)]:saturate-[.2] [@media(hover:hover)]:group-hover:saturate-100"
                   />
-                  {/* info card — hidden until hover/focus, like the Interactive Team Card */}
-                  <div className={`absolute right-3 bottom-[15px] left-3 z-10 flex scale-50 translate-y-[50px] items-center justify-between gap-3 rounded-lg bg-white p-3 opacity-0 shadow-xl transition-all duration-[800ms] ease-[cubic-bezier(.15,.45,.15,1.2)] group-hover:bottom-[25px] group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-within:bottom-[25px] group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100 ${lato.className}`}>
+                  {/* info card — always visible on touch devices, hover/focus
+                      reveal only where a hover capability exists */}
+                  <div
+                    className={`absolute right-3 bottom-4 left-3 z-10 flex translate-y-0 scale-100 items-center justify-between gap-3 rounded-lg bg-white p-3 opacity-100 shadow-xl transition-all duration-[800ms] ease-[cubic-bezier(.15,.45,.15,1.2)] group-focus-within:bottom-[25px] group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100 [@media(hover:hover)]:bottom-[15px] [@media(hover:hover)]:translate-y-[50px] [@media(hover:hover)]:scale-50 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:bottom-[25px] [@media(hover:hover)]:group-hover:translate-y-0 [@media(hover:hover)]:group-hover:scale-100 [@media(hover:hover)]:group-hover:opacity-100 ${lato.className}`}
+                  >
                     <div className="min-w-0">
                       <p className="truncate text-[17px] leading-tight text-neutral-900 sm:text-[20px]">
                         {leader.name}
@@ -114,7 +117,7 @@ export function ClubLeaders({ leaders }: { leaders: Leader[] }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`${leader.name} on LinkedIn`}
-                        className="group/link grid h-6 w-6 flex-shrink-0 place-items-center text-neutral-900 transition-transform duration-200 hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+                        className="group/link grid h-11 w-11 flex-shrink-0 place-items-center rounded-full text-neutral-900 transition-transform duration-200 hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
                       >
                         <LinkedInIcon />
                       </a>
