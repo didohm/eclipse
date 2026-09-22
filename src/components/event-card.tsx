@@ -32,7 +32,7 @@ export function EventCard({ event, index = 0 }: { event: ClubEvent; index?: numb
         aria-label={`Read about ${event.title}`}
         className="group block"
       >
-        <div className="relative h-[240px] overflow-hidden rounded-[18px] bg-[var(--ink)] shadow-[0_12px_32px_rgba(8,43,64,0.10)] sm:h-[300px] sm:rounded-[22px]">
+        <div className="relative h-[240px] overflow-hidden rounded-[20px] bg-[var(--ink)] shadow-[0_12px_32px_rgba(8,43,64,0.10)] sm:h-[300px] sm:rounded-[20px]">
           {image ? (
             <Image
               src={image}
@@ -44,10 +44,10 @@ export function EventCard({ event, index = 0 }: { event: ClubEvent; index?: numb
           ) : (
             <EmptyMedia label="Event imagery" />
           )}
-          <span className="absolute top-3 right-3 rounded-full border border-white/40 bg-white/85 px-3 py-1.5 font-mono text-[10px] tracking-[0.08em] text-[var(--ink)] uppercase backdrop-blur-md">
+          <span className="absolute top-3 right-3 rounded-full border border-white/40 bg-white/85 px-3 py-1.5 font-mono text-[11px] tracking-[0.08em] text-[var(--ink)] uppercase backdrop-blur-md">
             {String(index + 1).padStart(2, "0")}
           </span>
-          <span className="absolute right-3 bottom-3 grid h-10 w-10 place-items-center rounded-full bg-white text-[var(--ink)] shadow-lg transition-colors duration-300 group-hover:bg-[var(--coral)] group-hover:text-white">
+          <span className="absolute right-3 bottom-3 grid h-10 w-10 place-items-center rounded-full bg-white text-[var(--ink)] shadow-lg transition-colors duration-300 group-hover:bg-[var(--coral-deep)] group-hover:text-white">
             <ArrowUpRight size={18} aria-hidden="true" />
           </span>
         </div>
@@ -61,7 +61,7 @@ export function EventCard({ event, index = 0 }: { event: ClubEvent; index?: numb
               >
                 {day}
               </span>
-              <span className="mt-2 font-mono text-[11px] tracking-[0.1em] whitespace-nowrap text-[var(--coral)] uppercase">
+              <span className="mt-2 font-mono text-[11px] tracking-[0.1em] whitespace-nowrap text-[var(--coral-deep)] uppercase">
                 {month} {year}
               </span>
             </div>

@@ -152,7 +152,7 @@ export function SiteFooter() {
                           href={link.href}
                           target="_blank"
                           rel="noreferrer"
-                          className="footer-link group relative inline-flex items-center py-0.5 transition-all duration-300 hover:translate-x-[3px] hover:text-[#f45837]"
+                          className="footer-link group relative inline-flex items-center py-0.5 transition-all duration-300 hover:translate-x-[3px] hover:text-[var(--coral-deep)]"
                         >
                           {link.icon && (
                             <link.icon className="me-1.5 size-4 transition-transform duration-300 group-hover:scale-110" />
@@ -166,7 +166,7 @@ export function SiteFooter() {
                       ) : (
                         <Link
                           href={link.href}
-                          className="footer-link group relative inline-flex items-center py-0.5 transition-all duration-300 hover:translate-x-[3px] hover:text-[#f45837]"
+                          className="footer-link group relative inline-flex items-center py-0.5 transition-all duration-300 hover:translate-x-[3px] hover:text-[var(--coral-deep)]"
                         >
                           {link.icon && (
                             <link.icon className="me-1.5 size-4 transition-transform duration-300 group-hover:scale-110" />
@@ -193,9 +193,9 @@ export function SiteFooter() {
         </p>
         <a
           href="mailto:eclipse_club@esgen.edu.dz"
-          className="group inline-flex max-w-full items-center gap-2.5 rounded-full border border-[var(--line)] bg-[var(--paper)] py-2 pl-2.5 pr-4 text-[11.5px] font-bold text-[var(--ink)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--coral)] hover:bg-[var(--coral)] hover:text-white hover:shadow-[0_8px_20px_rgba(244,88,55,0.35)] sm:pr-5 sm:text-[13px]"
+          className="group inline-flex max-w-full items-center gap-2.5 rounded-full border border-[var(--line)] bg-[var(--paper)] py-2 pl-2.5 pr-4 text-[11.5px] font-bold text-[var(--ink)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--coral-deep)] hover:bg-[var(--coral-deep)] hover:text-white hover:shadow-[0_8px_20px_rgba(244,88,55,0.35)] sm:pr-5 sm:text-[13px]"
         >
-          <span className="grid h-7 w-7 place-items-center rounded-full bg-[var(--coral)] text-white transition-colors duration-300 group-hover:bg-white group-hover:text-[var(--coral)]">
+          <span className="grid h-7 w-7 place-items-center rounded-full bg-[var(--coral-deep)] text-white transition-colors duration-300 group-hover:bg-white group-hover:text-[var(--coral-deep)]">
             <Mail size={13} aria-hidden="true" />
           </span>
           <span className="truncate">eclipse_club@esgen.edu.dz</span>
@@ -205,7 +205,7 @@ export function SiteFooter() {
           onClick={scrollToTop}
           aria-label="Back to top"
           title="Back to top"
-          className="grid h-10 w-10 place-items-center rounded-full border border-[var(--line)] text-[var(--ink)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--coral)] hover:bg-[var(--coral)] hover:text-white hover:shadow-[0_8px_20px_rgba(244,88,55,0.35)]"
+          className="grid h-10 w-10 place-items-center rounded-full border border-[var(--line)] text-[var(--ink)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--coral-deep)] hover:bg-[var(--coral-deep)] hover:text-white hover:shadow-[0_8px_20px_rgba(244,88,55,0.35)]"
         >
           <ArrowUp size={15} aria-hidden="true" />
         </button>
@@ -220,7 +220,7 @@ export function SiteFooter() {
             target="_blank"
             rel="noreferrer"
             className="group relative inline-flex font-bold transition-colors duration-300 hover:text-[var(--ink)]"
-            style={{ color: "var(--coral)" }}
+            style={{ color: "var(--coral-deep)" }}
           >
             Boumedin Himich
             <span
