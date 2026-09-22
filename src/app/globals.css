@@ -588,6 +588,14 @@ a.info-card:hover > svg:last-child { color:var(--coral); }
     animation-play-state: paused;
   }
 }
+/* Hide scrollbars on swipeable tracks (e.g. mobile leaders carousel) */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 
 @media (max-width:860px) {
   .contact-map-simple { padding-bottom:80px; }

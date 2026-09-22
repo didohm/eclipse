@@ -2,6 +2,7 @@
 
 import { Lato } from "next/font/google";
 import { UserStar } from "lucide-react";
+import { useCallback, useRef, useState } from "react";
 import { TextReveal } from "@/components/motion/text-reveal";
 
 import { Marquee } from "@/components/ui/marquee";
@@ -10,6 +11,16 @@ import type { Leader } from "@/lib/types";
 const lato = Lato({ weight: "400", subsets: ["latin"], display: "swap" });
 
 export function ClubLeaders({ leaders }: { leaders: Leader[] }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
+
+  const handleTrackScroll = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    setProgress(max > 0 ? el.scrollLeft / max : 0);
+  }, []);
+
   return (
     <section className="relative w-full overflow-hidden pb-12 md:pb-16">
       {/* decorative curve, bottom-right — ECLIPSE ink at low opacity */}
@@ -79,54 +90,58 @@ export function ClubLeaders({ leaders }: { leaders: Leader[] }) {
         </div>
 
         {leaders.length ? (
-          <div className="relative w-full">
-            <div className="pointer-events-none absolute top-0 left-0 z-10 h-full w-8 bg-gradient-to-r from-[var(--paper)] to-transparent sm:w-32" />
-            <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-8 bg-gradient-to-l from-[var(--paper)] to-transparent sm:w-32" />
-
-            <Marquee className="[--gap:0.875rem] sm:[--gap:1.5rem]" pauseOnHover>
-              {leaders.map((leader) => (
-                <div
-                  className="group relative h-[360px] w-[clamp(210px,68vw,250px)] shrink-0 overflow-hidden rounded-xl bg-[var(--ink)] shadow-xl [-webkit-tap-highlight-color:transparent] sm:h-[400px] sm:w-[300px]"
-                  key={leader.id}
+          <>
+            {/* Mobile: swipeable snap carousel (native touch swipe) */}
+            <div className="relative w-full sm:hidden">
+              <div
+                ref={trackRef}
+                data-lenis-prevent
+                onScroll={handleTrackScroll}
+                className="no-scrollbar flex snap-x snap-mandatory gap-3.5 overflow-x-auto overscroll-x-contain px-6 pt-1 pb-2 [touch-action:pan-x_pan-y] [-webkit-overflow-scrolling:touch]"
+              >
+                {leaders.map((leader) => (
+                  <LeaderCard key={leader.id} leader={leader} snap />
+                ))}
+              </div>
+              {/* swipe hint + progress */}
+              <div className="mt-4 flex items-center gap-3 px-6">
+                <p
+                  aria-hidden="true"
+                  className="font-mono text-[10px] tracking-[0.11em] text-[var(--ink-soft)] uppercase"
                 >
-                  {/* Plain <img>: leader portraits come from the admin panel
-                      (any host), not covered by images.remotePatterns. */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    alt={leader.name}
-                    loading="lazy"
-                    src={leader.photoUrl}
-                    className="absolute inset-0 h-full w-full object-cover saturate-100 transition-all duration-[800ms] ease-[cubic-bezier(.15,.45,.15,1.2)] [@media(hover:hover)]:saturate-[.2] [@media(hover:hover)]:group-hover:scale-[1.07] [@media(hover:hover)]:group-hover:saturate-100"
-                  />
-                  {/* info card — always visible on touch devices, hover/focus
-                      reveal only where a hover capability exists */}
+                  Swipe
+                </p>
+                <div
+                  className="h-[2px] flex-1 overflow-hidden rounded-full bg-[var(--line)]"
+                  role="progressbar"
+                  aria-label="Leaders carousel progress"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(progress * 100)}
+                >
                   <div
-                    className={`absolute right-3 bottom-4 left-3 z-10 flex translate-y-0 scale-100 items-center justify-between gap-3 rounded-lg bg-white p-3 opacity-100 shadow-xl transition-all duration-[800ms] ease-[cubic-bezier(.15,.45,.15,1.2)] group-focus-within:bottom-[25px] group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100 [@media(hover:hover)]:bottom-[15px] [@media(hover:hover)]:translate-y-[50px] [@media(hover:hover)]:scale-50 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:bottom-[25px] [@media(hover:hover)]:group-hover:translate-y-0 [@media(hover:hover)]:group-hover:scale-100 [@media(hover:hover)]:group-hover:opacity-100 ${lato.className}`}
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-[17px] leading-tight text-neutral-900 sm:text-[20px]">
-                        {leader.name}
-                      </p>
-                      <p className="mt-1 truncate text-[13.5px] text-[#585858] sm:text-[15px]">
-                        {leader.position}
-                      </p>
-                    </div>
-                    {leader.linkedinUrl && (
-                      <a
-                        href={leader.linkedinUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${leader.name} on LinkedIn`}
-                        className="group/link grid h-11 w-11 flex-shrink-0 place-items-center rounded-full text-neutral-900 [-webkit-tap-highlight-color:transparent] transition-transform duration-200 [@media(hover:hover)]:hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
-                      >
-                        <LinkedInIcon />
-                      </a>
-                    )}
-                  </div>
+                    className="h-full rounded-full bg-[var(--ink)] transition-[width] duration-150"
+                    style={{ width: `${Math.max(8, progress * 100)}%` }}
+                  />
                 </div>
-              ))}
-            </Marquee>
-          </div>
+                <p className="font-mono text-[10px] tracking-[0.11em] text-[var(--ink-soft)] tabular-nums">
+                  {leaders.length}
+                </p>
+              </div>
+            </div>
+
+            {/* Desktop / tablet: auto-scrolling marquee */}
+            <div className="relative hidden w-full sm:block">
+              <div className="pointer-events-none absolute top-0 left-0 z-10 h-full w-8 bg-gradient-to-r from-[var(--paper)] to-transparent sm:w-32" />
+              <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-8 bg-gradient-to-l from-[var(--paper)] to-transparent sm:w-32" />
+
+              <Marquee className="[--gap:0.875rem] sm:[--gap:1.5rem]" pauseOnHover>
+                {leaders.map((leader) => (
+                  <LeaderCard key={leader.id} leader={leader} />
+                ))}
+              </Marquee>
+            </div>
+          </>
         ) : (
           <div className="mx-auto max-w-3xl px-6 text-center lg:px-0">
             <p className="eyebrow">Team in preparation</p>
@@ -169,6 +184,50 @@ export function ClubLeaders({ leaders }: { leaders: Leader[] }) {
         )}
       </div>
     </section>
+  );
+}
+
+function LeaderCard({ leader, snap = false }: { leader: Leader; snap?: boolean }) {
+  return (
+    <div
+      className={`group relative h-[360px] shrink-0 overflow-hidden rounded-xl bg-[var(--ink)] shadow-xl select-none [-webkit-tap-highlight-color:transparent] sm:h-[400px] sm:w-[300px] ${snap ? "w-[72vw] max-w-[280px] snap-center" : "w-[clamp(210px,68vw,250px)]"}`}
+    >
+      {/* Plain <img>: leader portraits come from the admin panel
+          (any host), not covered by images.remotePatterns. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        alt={leader.name}
+        loading="lazy"
+        draggable={false}
+        src={leader.photoUrl}
+        className="absolute inset-0 h-full w-full object-cover saturate-100 transition-all duration-[800ms] ease-[cubic-bezier(.15,.45,.15,1.2)] [@media(hover:hover)]:saturate-[.2] [@media(hover:hover)]:group-hover:scale-[1.07] [@media(hover:hover)]:group-hover:saturate-100"
+      />
+      {/* info card — always visible on touch devices, hover/focus
+          reveal only where a hover capability exists */}
+      <div
+        className={`absolute right-3 bottom-4 left-3 z-10 flex translate-y-0 scale-100 items-center justify-between gap-3 rounded-lg bg-white p-3 opacity-100 shadow-xl transition-all duration-[800ms] ease-[cubic-bezier(.15,.45,.15,1.2)] group-focus-within:bottom-[25px] group-focus-within:translate-y-0 group-focus-within:scale-100 group-focus-within:opacity-100 [@media(hover:hover)]:bottom-[15px] [@media(hover:hover)]:translate-y-[50px] [@media(hover:hover)]:scale-50 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:bottom-[25px] [@media(hover:hover)]:group-hover:translate-y-0 [@media(hover:hover)]:group-hover:scale-100 [@media(hover:hover)]:group-hover:opacity-100 ${lato.className}`}
+      >
+        <div className="min-w-0">
+          <p className="truncate text-[17px] leading-tight text-neutral-900 sm:text-[20px]">
+            {leader.name}
+          </p>
+          <p className="mt-1 truncate text-[13.5px] text-[#585858] sm:text-[15px]">
+            {leader.position}
+          </p>
+        </div>
+        {leader.linkedinUrl && (
+          <a
+            href={leader.linkedinUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${leader.name} on LinkedIn`}
+            className="group/link grid h-11 w-11 flex-shrink-0 place-items-center rounded-full text-neutral-900 [-webkit-tap-highlight-color:transparent] transition-transform duration-200 [@media(hover:hover)]:hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
+          >
+            <LinkedInIcon />
+          </a>
+        )}
+      </div>
+    </div>
   );
 }
 
