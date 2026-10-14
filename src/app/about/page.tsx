@@ -124,25 +124,42 @@ export default function AboutPage() {
         <div className="about-hero__grid" aria-hidden="true" />
         <div className="about-hero__orb about-hero__orb--teal" aria-hidden="true" />
         <div className="about-hero__orb about-hero__orb--gold" aria-hidden="true" />
-        <Reveal>
-          <p className="eyebrow about-hero__eyebrow">
-            <span aria-hidden="true" /> 01 — About ECLIPSE · ESGEN · Kolea — Est. 2025
-          </p>
-          <h1>
-            <span className="about-hero__line-wrap">
-              <span className="about-hero__line">Built for the</span>
-            </span>
-            <span className="about-hero__line-wrap">
-              <span className="about-hero__line about-hero__line--accent">
-                <em>curious.</em>
+        <div className="about-hero__inner">
+          <Reveal>
+            <p className="eyebrow about-hero__eyebrow">
+              <span aria-hidden="true" /> 01 — About ECLIPSE · ESGEN · Kolea — Est. 2025
+            </p>
+            <h1>
+              <span className="about-hero__line-wrap">
+                <span className="about-hero__line">Built for the</span>
               </span>
-            </span>
-          </h1>
-          <p className="about-hero__copy">
-            ECLIPSE is a scientific and active student club at ESGEN, focused on discovery, research, workshops, events, and the
-            digital economy — where questions become practice.
-          </p>
-        </Reveal>
+              <span className="about-hero__line-wrap">
+                <span className="about-hero__line about-hero__line--accent">
+                  <em>curious.</em>
+                </span>
+              </span>
+            </h1>
+            <p className="about-hero__copy">
+              ECLIPSE is a scientific and active student club at ESGEN, focused on discovery, research, workshops, events, and the
+              digital economy — where questions become practice.
+            </p>
+          </Reveal>
+          <Reveal delay={0.12} className="about-hero__media">
+            <div className="about-hero__photo">
+              <Image
+                src="https://res.cloudinary.com/drzwqhmsd/image/upload/f_auto,q_auto/v1791989092/myrotfzho0burzrowmki.jpg"
+                alt="ECLIPSE club members"
+                fill
+                sizes="(max-width: 800px) 100vw, 50vw"
+                style={{ objectFit: "cover" }}
+                priority
+              />
+              <span className="about-hero__photo-label" aria-hidden="true">
+                ECLIPSE · In action
+              </span>
+            </div>
+          </Reveal>
+        </div>
 
         <Reveal delay={0.12} className="about-hero__meta">
           <div className="about-hero__meta-left">
@@ -181,20 +198,7 @@ export default function AboutPage() {
           </div>
         </Reveal>
 
-        <Reveal delay={0.1} className="about-split__right">
-          <div className="about-split__photo">
-            <Image
-              src="https://res.cloudinary.com/drzwqhmsd/image/upload/f_auto,q_auto/v1791989092/myrotfzho0burzrowmki.jpg"
-              alt="ECLIPSE club members"
-              fill
-              sizes="(max-width: 800px) 100vw, 50vw"
-              style={{ objectFit: "cover" }}
-            />
-            <span className="about-split__photo-label" aria-hidden="true">
-              ECLIPSE · In action
-            </span>
-          </div>
-          <div className="about-approach">
+        <Reveal delay={0.1} className="about-approach">
           <div className="about-approach__header">
             <p className="eyebrow">
               <span aria-hidden="true" /> The ECLIPSE approach
@@ -216,7 +220,6 @@ export default function AboutPage() {
               </li>
             ))}
           </ol>
-          </div>
         </Reveal>
       </section>
 
