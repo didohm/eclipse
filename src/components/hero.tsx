@@ -71,7 +71,7 @@ export function Hero() {
           <div className="hero__mark-ring" />
           <video
             className="hero__mark-video"
-            src={showVideo ? "https://res.cloudinary.com/drzwqhmsd/video/upload/v1789571217/ifm7axnlzkhz6k8cngjk.mp4" : undefined}
+            src={showVideo ? "https://res.cloudinary.com/drzwqhmsd/video/upload/v1791989382/w4qy2jhfxa9ssxbl9ts6.mp4" : undefined}
             autoPlay
             muted
             loop

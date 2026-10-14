@@ -19,7 +19,7 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "ECLIPSE — Scientific & Digital Student Club at ESGEN, Kolea",
+    absolute: "Eclipse Club - ESGEN",
   },
   description:
     "Join ECLIPSE, ESGEN's scientific & digital student club in Kolea, Algeria. Workshops, research sprints, events and a curious student community — open to all five ESGEN disciplines.",
@@ -27,13 +27,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: site.url,
-    title: "ECLIPSE — Scientific & Digital Student Club at ESGEN, Kolea",
+    title: "Eclipse Club - ESGEN",
     description:
       "Workshops, research sprints, events and community for curious students at ESGEN, Kolea University Hub.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ECLIPSE — Scientific & Digital Student Club at ESGEN, Kolea",
+    title: "Eclipse Club - ESGEN",
     description:
       "Workshops, research sprints, events and community for curious students at ESGEN, Kolea University Hub.",
   },

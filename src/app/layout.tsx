@@ -26,8 +26,8 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "ECLIPSE — Scientific & Digital Student Club at ESGEN, Kolea",
-    template: "%s · ECLIPSE ESGEN",
+    default: "Eclipse Club - ESGEN",
+    template: "%s · Eclipse Club - ESGEN",
   },
   description: site.description,
   keywords: site.keywords,
@@ -54,8 +54,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: site.locale,
     url: site.url,
-    siteName: "ECLIPSE · ESGEN",
-    title: "ECLIPSE — Scientific & Digital Student Club at ESGEN, Kolea",
+    siteName: "Eclipse Club - ESGEN",
+    title: "Eclipse Club - ESGEN",
     description: site.description,
     images: [
       {
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ECLIPSE — Scientific & Digital Student Club at ESGEN, Kolea",
+    title: "Eclipse Club - ESGEN",
     description: site.description,
     images: ["/twitter-image"],
   },
