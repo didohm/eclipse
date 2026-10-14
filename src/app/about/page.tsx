@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, FlaskConical, Lightbulb, Microscope } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Handshake, Megaphone, Users } from "lucide-react";
 import Image from "next/image";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -17,7 +17,7 @@ const specialties = [
 export const metadata: Metadata = {
   title: "About ECLIPSE — Scientific & Digital Club at ESGEN",
   description:
-    "Learn about ECLIPSE, the scientific & digital student club at ESGEN, Kolea (est. 2025). Our Explore · Experiment · Exchange approach, history, ESGEN home and how to follow the circle.",
+    "Learn about ECLIPSE, the scientific & digital student club at ESGEN, Kolea (est. 2025). Our departments, history, ESGEN home and how to follow the circle.",
   alternates: { canonical: `${site.url}/about` },
   openGraph: {
     type: "website",
@@ -34,20 +34,20 @@ export const metadata: Metadata = {
   },
 };
 
-const approach = [
+const departments = [
   {
     index: "01",
-    title: "Explore",
-    desc: "Start with inquiry and scientific discovery — from first questions to field notes.",
-    Icon: Microscope,
+    title: "Marketing & Communication",
+    desc: "Editing, design & media — videos, visuals and content that carry the club's voice on campus and online.",
+    Icon: Megaphone,
   },
   {
     index: "02",
-    title: "Experiment",
-    desc: "Turn research and ideas into shared practice through workshops and sprints.",
-    Icon: FlaskConical,
+    title: "Human Resources",
+    desc: "Organization & team life — recruitment, coordination and event management that keep everyone in rhythm.",
+    Icon: Users,
   },
-  { index: "03", title: "Exchange", desc: "Build a community around questions worth pursuing, and carry them further together.", Icon: Lightbulb },
+  { index: "03", title: "External Relations & Research", desc: "Sponsoring & research — partnerships, sponsors and research projects that grow our impact beyond ESGEN.", Icon: Handshake },
 ] as const;
 
 const timeline = [
@@ -189,7 +189,7 @@ export default function AboutPage() {
             share knowledge, and take scientific initiative together across the digital economy.
           </p>
           <p className="about-split__lead">
-            We follow one rhythm — <em>Explore · Experiment · Exchange</em> — so every question finds its next step and its people.
+            Three departments, one rhythm — <em>Marketing · HR · Research</em> — so every talent finds its place and its people.
           </p>
           <div className="about-split__actions">
             <Link className="button button--navy" href="/contact">
@@ -201,11 +201,11 @@ export default function AboutPage() {
         <Reveal delay={0.1} className="about-approach">
           <div className="about-approach__header">
             <p className="eyebrow">
-              <span aria-hidden="true" /> The ECLIPSE approach
+              <span aria-hidden="true" /> Our departments
             </p>
           </div>
           <ol className="about-approach__list">
-            {approach.map(({ index, title, desc, Icon }) => (
+            {departments.map(({ index, title, desc, Icon }) => (
               <li key={index} className="about-approach__item">
                 <div className="about-approach__meta">
                   <span className="about-approach__index">{index}</span>
