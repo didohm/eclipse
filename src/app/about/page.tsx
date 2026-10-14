@@ -181,7 +181,20 @@ export default function AboutPage() {
           </div>
         </Reveal>
 
-        <Reveal delay={0.1} className="about-approach">
+        <Reveal delay={0.1} className="about-split__right">
+          <div className="about-split__photo">
+            <Image
+              src="https://res.cloudinary.com/drzwqhmsd/image/upload/f_auto,q_auto/v1791989092/myrotfzho0burzrowmki.jpg"
+              alt="ECLIPSE club members"
+              fill
+              sizes="(max-width: 800px) 100vw, 50vw"
+              style={{ objectFit: "cover" }}
+            />
+            <span className="about-split__photo-label" aria-hidden="true">
+              ECLIPSE · In action
+            </span>
+          </div>
+          <div className="about-approach">
           <div className="about-approach__header">
             <p className="eyebrow">
               <span aria-hidden="true" /> The ECLIPSE approach
@@ -203,6 +216,7 @@ export default function AboutPage() {
               </li>
             ))}
           </ol>
+          </div>
         </Reveal>
       </section>
 
