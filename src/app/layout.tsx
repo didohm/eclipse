@@ -25,6 +25,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
+verification: {
+  google: "p_A0LySPRa7guzQ0VIORtSbw9ka8MragjlPklH-d-8U",
+},
   title: {
     default: "Eclipse Club - ESGEN",
     template: "%s · Eclipse Club - ESGEN",
